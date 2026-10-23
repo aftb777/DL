@@ -1,0 +1,69 @@
+# TensorFlow Fundamentals and Perceptron: Perform basic tensor
+# operations in TensorFlow, then build a single-layer Perceptron and an MLP
+# for handwritten digit recognition and compare their
+
+
+import tensorflow as tf
+import numpy as np
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.datasets import mnist
+
+# 1. Basic Tensor Operations
+a = tf.constant([[1, 2], [3, 4]])
+b = tf.constant([[5, 6], [7, 8]])
+
+print("Addition:\n", tf.add(a, b))
+print("Multiplication:\n", tf.multiply(a, b))
+print("Matrix Multiplication:\n", tf.matmul(a, b))
+
+# 2. Load MNIST Dataset
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+
+# 3. Normalize pixel values
+X_train = X_train / 255.0
+X_test = X_test / 255.0
+
+# 4. Single-Layer Perceptron
+perceptron = Sequential([
+    Flatten(input_shape=(28, 28)),
+    Dense(10, activation="softmax")
+])
+
+perceptron.compile(
+    optimizer="adam",
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"]
+)
+
+perceptron.fit(X_train, y_train, epochs=5, batch_size=32)
+
+loss1, acc1 = perceptron.evaluate(X_test, y_test, verbose=0)
+
+print("Perceptron Accuracy:", acc1)
+
+# 5. Multilayer Perceptron (MLP)
+mlp = Sequential([
+    Flatten(input_shape=(28, 28)),
+    Dense(128, activation="relu"),
+    Dense(64, activation="relu"),
+    Dense(10, activation="softmax")
+])
+
+mlp.compile(
+    optimizer="adam",
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"]
+)
+
+mlp.fit(X_train, y_train, epochs=5, batch_size=32)
+
+loss2, acc2 = mlp.evaluate(X_test, y_test, verbose=0)
+
+print("MLP Accuracy:", acc2)
+
+# 6. Compare Results
+print("\nAccuracy Comparison")
+print("Perceptron:", round(acc1 * 100, 2), "%")
+print("MLP:", round(acc2 * 100, 2), "%")
